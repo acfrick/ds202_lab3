@@ -1,0 +1,106 @@
+---
+title: "individual2"
+author: "Audrey Comer"
+date: "2/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##1. Data cleaning: the values “IAP”, “DK” and “NA” all encode missing values. Replace all of these instances by the value NA.
+```{r}
+library(dplyr)
+data(happy, package="productplots")
+#head(happy)
+dfhappy<-readRDS('HAPPY.rds')
+#HAPPY == 'DK' | HAPPY == 'IAP'
+dfhappy[dfhappy == 'DK' | dfhappy == 'IAP'] <- NA
+```
+
+##2. Check the type of the variable and cast into the right type (factor variable for categorical variables). For age, change “89 OR OLDER” to 89 and assume the variable should be numeric.
+```{r}
+#dfhappy$AGE == '89 OR OLDER'
+dfhappy$AGE[which(dfhappy$AGE == '89 OR OLDER')] <- 89
+dfhappy$AGE<-as.numeric(dfhappy$AGE)
+unique(dfhappy$AGE) #unique shows each unique value in the set
+```
+
+##3. Bring all levels of factors into a sensible order. For marital you could e.g. order the levels according to average age.
+```{r}
+library(dplyr)
+dfhappy <- dfhappy %>%
+  mutate(HAPPY = factor(HAPPY, levels = c('NOT TOO HAPPY', 'PRETTY HAPPY', 'VERY HAPPY')))
+dfhappy <- dfhappy %>%
+  mutate(DEGREE = factor(DEGREE, levels = c('HIGH SCHOOL', 'LT HIGH SCHOOL', 'JUNIOR COLLEGE', 'BACHELOR', 'GRADUATE')))
+dfhappy <- dfhappy %>%
+  mutate(MARITAL = factor(MARITAL, levels = c('NEVER MARRIED', 'SEPARATED', 'MARRIED', 'DIVORCED', 'WIDOWED')))
+dfhappy <- dfhappy %>%
+  mutate(FINRELA = factor(FINRELA, levels = c('FAR BELOW AVERAGE', 'BELOW AVERAGE', 'AVERAGE', 'ABOVE AVERAGE', 'FAR ABOVE AVERAGE')))
+dfhappy <- dfhappy %>%
+  mutate(HEALTH = factor(HEALTH, levels = c('EXCELLENT','GOOD','FAIR','POOR')))
+dfhappy <- dfhappy %>%
+  mutate(PARTYID = factor(PARTYID, levels = c('STRONG DEMOCRAT', 'NOT STR DEMOCRAT', 'IND, NEAR DEM', 'INDEPENDENT', 'IND, NEAR REP', 'NOT STR REPUBLICAN','STRONG REPUBLICAN','OTHER PARTY')))
+dfhappy %>%
+  group_by(MARITAL) %>% summarise(m=mean(AGE, na.rm = TRUE)) %>% arrange(desc(m))
+
+```
+
+```{r}
+
+```
+
+###Part 2: Explore
+
+##1. Investigate the distributions of 2 different variables.
+```{r}
+library(ggplot2)
+library(ggmosaic)
+dfhappy %>%
+  ggplot(aes(x=AGE,fill=HAPPY)) + geom_histogram(binwidth=1)
+dfhappy %>% 
+  ggplot(aes(x=YEAR, fill=MARITAL)) + geom_histogram(binwidth = 1)
+```
+
+##2. Investigate the relationship between happiness and three other variables in the data.
+
+#Happiness based on health status (BELOW)
+```{r}
+
+dfhappy %>%
+  filter(!is.na(HAPPY)) %>%
+  filter(!is.na(HEALTH)) %>%
+  filter(!is.na(DEGREE)) %>%
+  ggplot(aes(x=HAPPY)) + geom_bar(aes(fill=HEALTH, color=SEX)) + xlab('Happiness Level') + ggtitle('Happiness based on Health Status') + coord_flip()
+
+```
+
+
+#Happiness by Party Identification (BELOW)
+```{r}
+dfhappy %>%
+  filter(!is.na(HAPPY)) %>%
+  filter(!is.na(PARTYID)) %>%
+  ggplot(aes(x=PARTYID)) + geom_bar(aes(fill=HAPPY)) + coord_flip() + xlab('Party Identification')
+```
+
+#Distribution of age, separated by degree level and happiness level (BELOW)
+```{r}
+dfhappy%>%
+  filter(!is.na(HAPPY)) %>%
+  filter(!is.na(DEGREE)) %>%
+  ggplot(aes(x=DEGREE, y=AGE, fill=HAPPY)) + geom_boxplot() + coord_flip()
+```
+
+#Happiness by Marriage Status (BELOW)
+```{r}
+dfhappy%>%
+  filter(!is.na(MARITAL)) %>%
+  filter(!is.na(HAPPY)) %>%
+  ggplot(aes(x=HAPPY, fill=HAPPY)) + geom_bar() + facet_wrap(~MARITAL, ncol=2, scales='free_y')
+```
+
+
+##3. What do you learn from the data set? Write one or two paragraphs to describe.
+There are many interacting variables that affect happiness. There are people who are unhappy and happy within every variable group -- married, graduate degree, Democrat, etc. However, it was notable that some variable distributions strayed from the typical patterns. For example, the happiness level among married people skewed much more toward "very happy" than any other marital status did. The same can be said for strong Republicans as compared with the rest of the political identities. Among those with a graduate degree, the ones who were "not too happy" were slightly older, on average, than those with a graduate degree who were "pretty happy" or "very happy".
