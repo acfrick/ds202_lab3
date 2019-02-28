@@ -117,15 +117,35 @@ PARTY IDENTIFICATION
 ggplot(HAPPY, aes(x=PARTYID)) + geom_bar()
 ```
 
-There was a pretty equal distribution across the parties; however their were more who reported they are "not strong democrats." Not many people were another party, but the most popular response was, perhaps, to not disclose their political party or affiliation.
+There was a pretty equal distribution across the parties; however there were more who reported they are "not strong democrats." Not many people were another party, but the most popular response was, perhaps, to not disclose their political party or affiliation.
 
 
 **Part Two**
 
+```{r}
+library(ggmosaic)
+ggplot(data = HAPPY) + geom_mosaic(aes(x = product(SEX), fill=DEGREE)) + facet_grid(HAPPY$HAPPY)
+```
 
 
+```{r}
+HAPPY%>%
+  filter(!is.na(HAPPY)) %>%
+  filter(!is.na(MARITAL)) %>%
+  ggplot(aes(x=MARITAL, y=AGE, fill=HAPPY)) + geom_boxplot() + coord_flip()
+```
+
+This shows how young widowed people and old never-married people are outliers. Of the people who never married, the ones who are unhappy were older on average -- perhaps because younger unmarried people have hopes to get married while still young. In the divorced, married, and separated columns, those that labeled themselves "pretty" happy were younger on average than their "not too" and "very" happy counterparts within the same columns. The older the widowed person, the happier they are on average. The reverse is true for never married--the older they are, the unhappier they are. 
 
 
+```{r}
+HAPPY %>%
+  filter(!is.na(HAPPY)) %>%
+  filter(!is.na(PARTYID)) %>%
+  ggplot() + geom_mosaic(aes(product(x=PARTYID),fill=HAPPY)) + coord_flip() + xlab('Party Identification') + ylab('Happiness') + facet_grid(~SEX)
+```
+
+Females tend more toward Democrat; males tend more toward Republican. Regardless of sex, Republicans report a higher level of happiness; independents report the highest percentage of unhappiness.  
 
 
 
