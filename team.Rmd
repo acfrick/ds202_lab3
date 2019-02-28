@@ -6,6 +6,7 @@ output: html_document
 ---
 
 Owner: Allegra Frickel
+
 Partner: Audrey Comer
 
 ```{r}
@@ -43,7 +44,7 @@ unique(HAPPY$AGE)
 3. Ordering variables into a sensible order
 ```{r}
 library(dplyr)
-HAPPY <- HAPPY %>% mutate(DEGREE = factor(DEGREE, levels = c('HIGH SCHOOL', 'LT HIGH SCHOOL', 'JUNIOR COLLEGE', 'BACHELOR', 'GRADUATE')))
+HAPPY <- HAPPY %>% mutate(DEGREE = factor(DEGREE, levels = c('LT HIGH SCHOOL', 'HIGH SCHOOL', 'JUNIOR COLLEGE', 'BACHELOR', 'GRADUATE')))
 HAPPY <- HAPPY %>% mutate(HAPPY = factor(HAPPY, levels = c('NOT TOO HAPPY', 'PRETTY HAPPY', 'VERY HAPPY')))
 HAPPY <- HAPPY %>% mutate(SEX = factor(SEX, levels = c('FEMALE', 'MALE')))
 HAPPY <- HAPPY %>% mutate(FINRELA = factor(FINRELA, levels = c('FAR BELOW AVERAGE', 'BELOW AVERAGE', 'AVERAGE', 'ABOVE AVERAGE', 'FAR ABOVE AVERAGE')))
@@ -122,11 +123,30 @@ There was a pretty equal distribution across the parties; however there were mor
 
 **Part Two**
 
+1. Investigate the distributions of 2 different variables.
+```{r}
+library(ggplot2)
+library(ggmosaic)
+library(ggplot2)
+ggplot(HAPPY, aes(x=YEAR)) + geom_bar(aes(fill=MARITAL)) + xlab('Year') + ggtitle('Marital Statuses Based on Year')
+```
+
+Marital and Year: This distribution displays how marital statuses changed and how marriages increased and decreased among the 1970s to 2010s. We can see that throughout the entire timespan of the data, there are more marraiges than other marital statuses. The second most popular marital status was never married. The largest observation is that the number of people interviewed and inclduded in the data increased in the mid-1990s and didn't decrease after. Instead, in the mid-2000s there was another large increase in marital statuses, but it decreased within the next couple of years. This could demonstrate that there were more marriages, few more divorces and adults reporting they were never married starting in the mid-1990s until the mid-2010s.
+
+```{r}
+ggplot(HAPPY, aes(x=DEGREE, fill=SEX)) + geom_bar() + coord_flip()
+```
+
+Sex and Degree: This barplot displays the relationship of degree and sex. Based on this data, out of those who have a high school, LT high school, or junior college degree, most of them are females. Out of those who have Bachelor's degrees, about half of them are female, half are male. Of those who have a Graduate degree, there are more males. The NA may represent a higher degree than graduate degree or no degree at all.
+
+2. Investigate the relationship between happiness and three other variables in the data.
+
 ```{r}
 library(ggmosaic)
 ggplot(data = HAPPY) + geom_mosaic(aes(x = product(SEX), fill=DEGREE)) + facet_grid(HAPPY$HAPPY)
 ```
 
+Happiness, Sex and Degree: This mosaic plot displays happiness based on degree and sex. We see that a majority of repondents have their high school degree as their highest degree. As the level of degree increases, the number of people decreases. However, we see that as happiness increases, degree does as well. In other words, perhaps the respondents with higher degrees (Bachelor and Graduate) report they are happier (Pretty Happy and Very Happy).
 
 ```{r}
 HAPPY%>%
@@ -147,9 +167,28 @@ HAPPY %>%
 
 Females tend more toward Democrat; males tend more toward Republican. Regardless of sex, Republicans report a higher level of happiness; independents report the highest percentage of unhappiness.  
 
+Distribution of age, separated by degree level and happiness level (BELOW)
+```{r}
+HAPPY%>%
+  filter(!is.na(HAPPY)) %>%
+  filter(!is.na(DEGREE)) %>%
+  ggplot(aes(x=DEGREE, y=AGE, fill=HAPPY)) + geom_boxplot() + coord_flip()
+```
 
+Happiness based on age and degree: We see that there is not a lot of evidence indicating a relationship between these variables. However, we see interestingly that the less than high school degree has a larger inner quartile range of happiness, despite not having a degree. So, we may be able to conclude that those who do not have a collegiate degree are happier, based on these variables alone.
 
+Happiness by Marriage Status (BELOW)
 
+```{r}
+HAPPY%>%
+  filter(!is.na(MARITAL)) %>%
+  filter(!is.na(HAPPY)) %>%
+  ggplot(aes(x=HAPPY, fill=HAPPY)) + geom_bar() + facet_wrap(~MARITAL, ncol=2, scales='free_y')
+```
 
+Happiness based on marital status: A majority of respondants report that they are pretty happy, despite their marital status. However, there are more very happy people who are married than any other marital status.
 
+3.What do you learn from the data set? Write one or two paragraphs to describe.
+
+There are many interacting variables that affect happiness. There are people who are unhappy and happy within every variable group -- married, graduate degree, Democrat, etc. However, it was notable that some variable distributions strayed from the typical patterns. For example, the happiness level among married people skewed much more toward "very happy" than any other marital status did. The same can be said for strong Republicans as compared with the rest of the political identities. Among those with a graduate degree, the ones who were "not too happy" were slightly older, on average, than those with a graduate degree who were "pretty happy" or "very happy".
 
