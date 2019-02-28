@@ -1,0 +1,163 @@
+---
+title: "individual1"
+author: "Allegra Frickel"
+date: "2/19/2019"
+output: html_document
+---
+
+```{r}
+data(happy, package="productplots")
+head(happy)
+```
+
+```{r}
+HAPPY <- readRDS("HAPPY.rds")
+head(HAPPY)
+```
+
+*Part One*
+
+1. Data cleaning
+```{r}
+HAPPY[HAPPY == "IAP" | HAPPY == "DK"] <- NA
+head(HAPPY)
+```
+
+2. Type of variable
+```{r echo=TRUE, include=FALSE}
+typeof(HAPPY$AGE)
+?as.character
+HAPPY$AGE[which(HAPPY$AGE == "89 OR OLDER")] <- 89
+as.numeric(HAPPY$AGE)
+HAPPY$AGE <- as.numeric(HAPPY$AGE)
+unique(HAPPY$AGE)
+```
+
+3. Sensible order
+```{r}
+library(dplyr)
+HAPPY <- HAPPY %>% mutate(DEGREE = factor(DEGREE, levels = c('HIGH SCHOOL', 'LT HIGH SCHOOL', 'JUNIOR COLLEGE', 'BACHELOR', 'GRADUATE')))
+HAPPY <- HAPPY %>% mutate(HAPPY = factor(HAPPY, levels = c('NOT TOO HAPPY', 'PRETTY HAPPY', 'VERY HAPPY')))
+HAPPY <- HAPPY %>% mutate(SEX = factor(SEX, levels = c('FEMALE', 'MALE')))
+HAPPY <- HAPPY %>% mutate(FINRELA = factor(FINRELA, levels = c('FAR BELOW AVERAGE', 'BELOW AVERAGE', 'AVERAGE', 'ABOVE AVERAGE', 'FAR ABOVE AVERAGE')))
+HAPPY <- HAPPY %>% mutate(HEALTH = factor(HEALTH, levels = c('POOR', 'FAIR', 'GOOD', 'EXCELLENT')))
+HAPPY %>% group_by(MARITAL) %>% summarize(m=mean(AGE, na.rm = TRUE)) %>% arrange(desc(m))
+HAPPY <- HAPPY %>% mutate(MARITAL = factor(MARITAL, levels = c('NEVER MARRIED', 'SEPARATED', 'MARRIED', 'DIVORCED', 'WIDOWED')))
+HAPPY <- HAPPY %>% mutate(PARTYID = factor(PARTYID, levels = c('STRONG DEMOCRAT', 'NOT STR DEMOCRAT', 'IND, NEAR DEM', 'INDEPENDENT', 'IND, NEAR REP', 'NOT STR REPUBLICAN', 'OTHER PARTY')))
+```
+
+Charts of variables
+```{r}
+library(ggplot2)
+ggplot(HAPPY, aes(x=HAPPY)) + geom_bar()
+```
+
+Above displays the distribution of the interviewees' happiness. As displayed by the skewed right barplot, some reported they were not too happy, but the majority reported they were at least pretty happy.
+
+```{r}
+ggplot(HAPPY, aes(x=YEAR)) + geom_bar()
+```
+
+This displays the number of people that were interviewed in what year. There was a large increase in the number of people interviewed after the mid-1990s.
+
+```{r}
+ggplot(HAPPY, aes(x=AGE)) + geom_bar()
+```
+
+Above displays the distribution of the age interviewees were at the time of the interview. It is evident that the distribution is skewed to the right. A majority of the interviewees were in between 22 and 60, the most common age being around 30 years old.
+
+```{r}
+ggplot(HAPPY, aes(x=SEX)) + geom_bar()
+```
+
+Above displays the count of females and males that were interviewed for the data. This demonstrates that there were more females than males interviewed for the data.
+
+
+```{r}
+ggplot(HAPPY, aes(x=MARITAL)) + geom_bar()
+```
+
+A majority of those interviewed in the data were married. The second most popular marital status was never married, and the least popular response was separated.
+
+```{r}
+ggplot(HAPPY, aes(x=DEGREE)) + geom_bar()
+```
+
+A majority of respondents had a high school degree as their highest degree. The distribution is skewed right, indicating less and less people continue their education as they get a degree.
+
+```{r}
+ggplot(HAPPY, aes(x=FINRELA)) + geom_bar()
+```
+
+This displays that the distribution of those interviewed for the data set was fairly normal. A majority of interviewees reported they were about average, regarding their household income.
+
+```{r}
+ggplot(HAPPY, aes(x=HEALTH)) + geom_bar()
+```
+
+A majority of those interviewed for the data reported they have either "good" or "excellent" health. The NA column may represent those who wished to not disclose their health.
+
+```{r}
+ggplot(HAPPY, aes(x=PARTYID)) + geom_bar()
+```
+
+There was a pretty equal distribution across the parties; however their were more who reported they are "not strong democrats." Not many people were another party, but the most popular response was to not disclose their political party or affiliation.
+
+
+
+*Part Two*
+
+1. Investigate the distributions of two different variables
+```{r}
+library(ggplot2)
+ggplot(HAPPY, aes(x=YEAR)) + geom_bar(aes(fill=MARITAL)) + xlab('Year') + ggtitle('Marital Statuses Based on Year')
+```
+
+Marital and Year: This distribution displays how marital statuses changed and how marriages increased and decreased among the 1970s to 2010s. We can see that throughout the entire timespan of the data, there are more marraiges than other marital statuses. The second most popular marital status was never married. The largest observation is that the number of people interviewed and inclduded in the data increased in the mid-1990s and didn't decrease after. Instead, in the mid-2000s there was another large increase in marital statuses, but it decreased within the next couple of years. This could demonstrate that there were more marriages, few more divorces and adults reporting they were never married starting in the mid-1990s until the mid-2010s.
+
+```{r}
+ggplot(HAPPY, aes(x=DEGREE, fill=SEX)) + geom_bar() + coord_flip()
+```
+
+Sex and Degree: This barplot displays the relationship of degree and sex. Based on this data, out of those who have a high school, LT high school, or junior college degree, most of them are females. Out of those who have Bachelor's degrees, about half of them are female, half are male. Of those who have a Graduate degree, there are more males. The NA may represent a higher degree than graduate degree or no degree at all.
+
+2. Investigate the relationship between happiness and three other variables in the data.
+
+```{r}
+ggplot(HAPPY, aes(x=AGE, fill=SEX)) + geom_histogram(binwidth = 5) + facet_grid(~HAPPY) #WHY DOES IT ONLY SAY PRETTY HAPPY AND VERY HAPPY?
+```
+
+Happiness, Age and Sex: This histogram displays the distributions of happiness based on age and sex. There are more females than males in this data set, but there are more females who reported they are not too happy than males who reported they are not too happy. This is the similar trend with pretty happy and very happy as well. Otherwise, we see that a majority of respondents reported that they are either pretty happy or very happy. It is also interesting to see those who are very happy are also older.
+
+```{r}
+library(ggmosaic)
+ggplot(data = HAPPY) + geom_mosaic(aes(x = product(SEX), fill=DEGREE)) + facet_grid(HAPPY$HAPPY)
+```
+
+Happiness, Sex and Degree: This mosaic plot displays happiness based on degree and sex. We see that a majority of repondents have their high school degree as their highest degree. As the level of degree increases, the number of people decreases. However, we see that as happiness increases, degree does as well. In other words, perhaps the respondents with higher degrees (Bachelor and Graduate) report they are happier (Pretty Happy and Very Happy).
+
+```{r}
+ggplot(HAPPY, aes(x=HAPPY, y=AGE)) + geom_boxplot()
+```
+
+Happiness and Age: This boxplot displays the distribution of age among those who reported Not Too Happy, Pretty Happy and Very Happy. The average age for those who are not too happy is 45 years old. The average age for those who reported they are pretty happy is 42. Similar to Not Too Happy, the average age of those who reported they are very happy is also 45 years old. This boxplot displays that age does not affect happiness directly and that there could be other variables that affect happiness.
+
+
+3. What did you learn from the data set?
+
+I learned that there isn't just one variable that affects happiness in this case. Rather, a combination of variables is where you can really start to identify patterns. For example, just by looking at the barplots in part one, you can't draw many conclusions from them, other than what a majority of the respondents reported. In other words, you can see the shape, center, spread and outliers of the distribution, but you may not be able to draw conclusions about them regarding their effect on happiness. On the other hand, the barplots in number one of part two are where you can start to see some other variables that can also bleed into happiness. Overall, to display that one variable has an affect on the variable you are measuring, you have to explore several options and several different vasiualizations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
