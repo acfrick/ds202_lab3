@@ -1,0 +1,135 @@
+---
+title: "team"
+author: "Allegra Frickel"
+date: "2/27/2019"
+output: html_document
+---
+
+Owner: Allegra Frickel
+Partner: Audrey Comer
+
+```{r}
+data(happy, package="productplots")
+head(happy)
+```
+
+```{r}
+HAPPY <- readRDS("HAPPY.rds")
+head(HAPPY)
+```
+
+
+**Part One**
+
+1. Data cleaning
+```{r}
+HAPPY[HAPPY == "IAP" | HAPPY == "DK"] <- NA
+head(HAPPY)
+```
+
+2. Type of variable
+```{r echo=TRUE, include=FALSE}
+typeof(HAPPY$AGE)
+?as.character
+HAPPY$AGE[which(HAPPY$AGE == "89 OR OLDER")] <- 89
+as.numeric(HAPPY$AGE)
+HAPPY$AGE <- as.numeric(HAPPY$AGE)
+```
+
+```{r}
+unique(HAPPY$AGE)
+```
+
+3. Ordering variables into a sensible order
+```{r}
+library(dplyr)
+HAPPY <- HAPPY %>% mutate(DEGREE = factor(DEGREE, levels = c('HIGH SCHOOL', 'LT HIGH SCHOOL', 'JUNIOR COLLEGE', 'BACHELOR', 'GRADUATE')))
+HAPPY <- HAPPY %>% mutate(HAPPY = factor(HAPPY, levels = c('NOT TOO HAPPY', 'PRETTY HAPPY', 'VERY HAPPY')))
+HAPPY <- HAPPY %>% mutate(SEX = factor(SEX, levels = c('FEMALE', 'MALE')))
+HAPPY <- HAPPY %>% mutate(FINRELA = factor(FINRELA, levels = c('FAR BELOW AVERAGE', 'BELOW AVERAGE', 'AVERAGE', 'ABOVE AVERAGE', 'FAR ABOVE AVERAGE')))
+HAPPY <- HAPPY %>% mutate(HEALTH = factor(HEALTH, levels = c('POOR', 'FAIR', 'GOOD', 'EXCELLENT')))
+HAPPY %>% group_by(MARITAL) %>% summarize(m=mean(AGE, na.rm = TRUE)) %>% arrange(desc(m))
+HAPPY <- HAPPY %>% mutate(MARITAL = factor(MARITAL, levels = c('NEVER MARRIED', 'SEPARATED', 'MARRIED', 'DIVORCED', 'WIDOWED')))
+HAPPY <- HAPPY %>% mutate(PARTYID = factor(PARTYID, levels = c('STRONG DEMOCRAT', 'NOT STR DEMOCRAT', 'IND, NEAR DEM', 'INDEPENDENT', 'IND, NEAR REP', 'NOT STR REPUBLICAN', 'OTHER PARTY')))
+```
+
+Basic charts of variables:
+
+HAPPINESS
+```{r}
+library(ggplot2)
+ggplot(HAPPY, aes(x=HAPPY)) + geom_bar()
+```
+
+Above displays the distribution of the interviewees' happiness. As displayed by the skewed right barplot, some reported they were not too happy, but the majority reported they were at least pretty happy.
+
+YEAR
+```{r}
+ggplot(HAPPY, aes(x=YEAR)) + geom_bar()
+```
+
+This displays the number of people that were interviewed in what year. There was a large increase in the number of people interviewed after the mid-1990s.
+
+AGE
+```{r}
+ggplot(HAPPY, aes(x=AGE)) + geom_bar()
+```
+
+Above displays the distribution of the age interviewees at the time of the interview. It is evident that the distribution is skewed to the right. A majority of the interviewees were between 22 and 60 years old, the most common age being around 30 years old.
+
+SEX
+```{r}
+ggplot(HAPPY, aes(x=SEX)) + geom_bar()
+```
+
+Above displays the count of females and males that were interviewed for the data. This demonstrates that there were more females than males interviewed for the data.
+
+MARITAL STATUS
+```{r}
+ggplot(HAPPY, aes(x=MARITAL)) + geom_bar()
+```
+
+A majority of those interviewed in the data were married. The second most popular marital status was never married, and the least popular response was separated.
+
+DEGREE
+```{r}
+ggplot(HAPPY, aes(x=DEGREE)) + geom_bar()
+```
+
+A majority of respondents had a high school degree as their highest degree. The distribution is skewed right, indicating less and less people continued their education as they get a degree.
+
+FINANCIAL RELATIONSHIP
+```{r}
+ggplot(HAPPY, aes(x=FINRELA)) + geom_bar()
+```
+
+This displays that the distribution of those interviewed for the data set was fairly normal. A majority of interviewees reported they were about average, regarding their household income.
+
+HEALTH
+```{r}
+ggplot(HAPPY, aes(x=HEALTH)) + geom_bar()
+```
+
+A majority of those interviewed for the data reported they have either "good" or "excellent" health. The NA column may represent those who wished to not disclose their health.
+
+PARTY IDENTIFICATION
+```{r}
+ggplot(HAPPY, aes(x=PARTYID)) + geom_bar()
+```
+
+There was a pretty equal distribution across the parties; however their were more who reported they are "not strong democrats." Not many people were another party, but the most popular response was, perhaps, to not disclose their political party or affiliation.
+
+
+**Part Two**
+
+
+
+
+
+
+
+
+
+
+
+
